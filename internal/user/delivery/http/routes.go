@@ -7,4 +7,5 @@ import (
 
 func MapUserRoutes(group *gin.RouterGroup, userHandler *UserHandler, middlewareManager *middleware.MiddlewareManager) {
 	group.GET("/current", userHandler.Get())
+	group.GET("", userHandler.GetByEmail())
 }

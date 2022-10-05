@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/igilgyrg/gin-todo/internal/entity"
+	internalError "github.com/igilgyrg/gin-todo/internal/error"
 )
 
 type UserHandler struct {
@@ -23,7 +24,16 @@ func (h *UserHandler) Get() func(ctx *gin.Context) {
 			Email:     "ig.pomazkov@gmail.com",
 			CreatedAt: time.Now(),
 		}
-		time.Sleep(6 * time.Second)
 		ctx.JSON(http.StatusOK, user)
+	}
+}
+
+func (h *UserHandler) GetByEmail() func(ctx *gin.Context) {
+	return func(ctx *gin.Context) {
+		email, ok := ctx.GetQuery("email")
+		if !ok {
+			ctx.Error(internalError.NewBadRequestError(nil, "email is required"))
+		}
+		ctx.JSON(http.StatusOK, email)
 	}
 }

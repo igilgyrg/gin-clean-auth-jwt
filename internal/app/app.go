@@ -1,21 +1,19 @@
 package app
 
 import (
-	"context"
-	"github.com/gin-gonic/gin"
-	"github.com/igilgyrg/gin-todo/pkg/logging"
-	mongoClient "github.com/igilgyrg/gin-todo/pkg/repository/mongo"
-	"go.mongodb.org/mongo-driver/mongo"
+	"fmt"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	mongoClient "github.com/igilgyrg/gin-todo/pkg/repository/mongo"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const ctxTimeout = 5
 const timeoutServer = 10
 
 type App struct {
@@ -46,15 +44,10 @@ func (a *App) StartServer() {
 	}
 
 	server := &http.Server{
-		Addr:           ":3000",
+		Addr:           fmt.Sprintf(":%s", a.cfg.Port),
 		Handler:        a.router,
-		MaxHeaderBytes: 1 << 20,
-		WriteTimeout:   timeoutServer,
-		BaseContext: func(listener net.Listener) context.Context {
-			ctx, shutdown := context.WithTimeout(logging.ContextWithLogger(context.Background()), ctxTimeout*time.Second)
-			defer shutdown()
-			return ctx
-		},
+		MaxHeaderBytes: 1 << 10,
+		WriteTimeout:   timeoutServer * time.Second,
 	}
 
 	go func() {
